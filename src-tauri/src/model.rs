@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-const MANGADEX_UPLOADS_ROOT: &str = "https://uploads.mangadex.org";
+use crate::constants::MANGADEX_UPLOADS;
 
 #[derive(Debug, Serialize)]
 pub struct MangaView {
@@ -10,6 +10,7 @@ pub struct MangaView {
     title: String,
     status: String,
     cover_url: Option<String>,
+    lang_codes: Vec<String>,
 }
 
 impl From<MangaData> for MangaView {
@@ -32,18 +33,31 @@ impl From<MangaData> for MangaView {
             .and_then(|rel: Relationship| {
                 let file_name = rel.attributes?.file_name?;
                 let url = format!(
-                    "{MANGADEX_UPLOADS_ROOT}/covers/{}/{}.512.jpg",
+                    "{MANGADEX_UPLOADS}/covers/{}/{}.512.jpg",
                     manga.id, file_name,
                 );
 
                 Some(url)
             });
 
+        let lang_codes = manga
+            .attributes
+            .translations
+            .into_iter()
+            .map(|t| t.split('-').next().unwrap().to_string())
+            .map(|code| match code.as_str() {
+                "en" => "gb".to_string(),
+                "zh" => "cn".to_string(),
+                c => c.to_string(),
+            })
+            .collect();
+
         MangaView {
             id: manga.id,
             title,
             status: manga.attributes.status,
             cover_url,
+            lang_codes,
         }
     }
 }
@@ -59,6 +73,8 @@ pub struct MangaData {
 struct Attributes {
     status: String,
     title: HashMap<String, String>,
+    #[serde(rename = "availableTranslatedLanguages")]
+    translations: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
