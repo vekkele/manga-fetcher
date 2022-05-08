@@ -14,10 +14,10 @@ impl From<MangaData> for MangaView {
         let mut title_map = manga.attributes.title;
 
         let title = title_map.remove("en").unwrap_or_else(|| {
-            let mut title_iter = title_map.iter();
+            let mut title_iter = title_map.into_iter();
 
             match title_iter.next() {
-                Some((_, value)) => value.to_owned(),
+                Some((_, value)) => value,
                 None => "".to_string(),
             }
         });
