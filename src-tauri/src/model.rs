@@ -2,11 +2,14 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+const MANGADEX_UPLOADS_ROOT: &str = "https://uploads.mangadex.org";
+
+#[derive(Debug, Serialize)]
 pub struct MangaView {
     id: String,
     title: String,
     status: String,
+    cover_url: Option<String>,
 }
 
 impl From<MangaData> for MangaView {
@@ -22,10 +25,25 @@ impl From<MangaData> for MangaView {
             }
         });
 
+        let cover_url: Option<String> = manga
+            .relationships
+            .into_iter()
+            .find(|rel| rel.rel_type == "cover_art")
+            .and_then(|rel: Relationship| {
+                let file_name = rel.attributes?.file_name?;
+                let url = format!(
+                    "{MANGADEX_UPLOADS_ROOT}/covers/{}/{}.512.jpg",
+                    manga.id, file_name,
+                );
+
+                Some(url)
+            });
+
         MangaView {
             id: manga.id,
             title,
             status: manga.attributes.status,
+            cover_url,
         }
     }
 }
@@ -34,12 +52,26 @@ impl From<MangaData> for MangaView {
 pub struct MangaData {
     id: String,
     attributes: Attributes,
+    relationships: Vec<Relationship>,
 }
 
 #[derive(Debug, Deserialize)]
 struct Attributes {
     status: String,
     title: HashMap<String, String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Relationship {
+    #[serde(rename = "type")]
+    rel_type: String,
+    attributes: Option<RelationshipAttributes>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RelationshipAttributes {
+    #[serde(rename = "fileName")]
+    file_name: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

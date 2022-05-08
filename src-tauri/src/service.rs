@@ -21,7 +21,7 @@ pub fn search(query: &str) -> Result<Vec<MangaView>, SearchError> {
         return Err(SearchError::EmptyQuery);
     }
 
-    let search_url = format!("{MANGADEX_ROOT}/manga?title={query}&limit=5");
+    let search_url = format!("{MANGADEX_ROOT}/manga?title={query}&includes[]=cover_art&limit=5");
     let res: ApiResponse<Vec<MangaData>> = reqwest::blocking::get(search_url)?.json()?;
 
     let result = match res.result.as_str() {
