@@ -1,11 +1,11 @@
 <script lang="ts">
   import Button from "@smui/button";
   import TextField from "@smui/textfield";
-  import { search, TitleView } from "src/commands";
+  import { search, MangaView } from "src/commands";
   import router, { Route } from "src/router/router";
 
-  let query = "";
-  let titlesPromise: Promise<TitleView[]>;
+  let query = "kiseiju"; //TODO: Remove
+  let titlesPromise: Promise<MangaView[]>;
 
   async function submit() {
     titlesPromise = search(query);
@@ -25,8 +25,8 @@
     <p>Loading...</p>
   {:then titles}
     {#each titles as title}
-      <h4>{title.name}</h4>
-      <h6>{title.url}</h6>
+      <h4>{title.title}</h4>
+      <h6>{title.status}</h6>
     {/each}
   {/await}
 {/if}

@@ -30,6 +30,7 @@
     "vite-tsconfig-paths": "^3.4.1"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.0.0-rc.4"
+    "@tauri-apps/api": "^1.0.0-rc.4",
+    "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#release"
   }
 }

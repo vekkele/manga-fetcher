@@ -1,11 +1,19 @@
 import { invoke } from "@tauri-apps/api";
+import { error } from 'tauri-plugin-log-api';
 
-export type TitleView = {
-  name: string
-  url: string
+
+export type MangaView = {
+  id: string
+  title: string
+  status: string
 }
 
-export function search(query: string): Promise<TitleView[]> {
-  return invoke('search', { query });
+export async function search(query: string): Promise<MangaView[]> {
+  try {
+    return invoke('search', { query });
+  } catch (e) {
+    error(`failed to invoke command "search": ${e}`)
+    return [];
+  }
 }
 
