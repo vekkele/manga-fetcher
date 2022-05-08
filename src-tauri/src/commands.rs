@@ -2,7 +2,8 @@ use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::service::search;
+use crate::model;
+use crate::service;
 
 #[derive(Debug, Error, Serialize)]
 pub enum SearchError {
@@ -12,9 +13,9 @@ pub enum SearchError {
     Internal,
 }
 
-impl From<search::SearchError> for SearchError {
-    fn from(e: search::SearchError) -> Self {
-        use search::SearchError::*;
+impl From<service::SearchError> for SearchError {
+    fn from(e: service::SearchError) -> Self {
+        use service::SearchError::*;
 
         match e {
             EmptyQuery => Self::EmptyQuery,
@@ -24,10 +25,10 @@ impl From<search::SearchError> for SearchError {
 }
 
 #[tauri::command]
-pub fn search(query: &str) -> Result<Vec<search::MangaView>, SearchError> {
+pub fn search(query: &str) -> Result<Vec<model::MangaView>, SearchError> {
     debug!("searching for \"{query}\"");
 
-    match search::search(query) {
+    match service::search(query) {
         Ok(res) => {
             debug!("success. Found {} entries", res.len());
             Ok(res)
