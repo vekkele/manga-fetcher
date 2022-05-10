@@ -6,8 +6,8 @@
 @use '@material/theme/index' as theme with (
   $primary: #ff3e00,
   $secondary: #676778,
-  $surface: #fff,
-  $background: #fff,
+  $surface: color-palette.$grey-100,
+  $background: color-palette.$grey-200,
   $error: color-palette.$red-900
 );
 

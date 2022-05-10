@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::constants::MANGADEX_UPLOADS;
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MangaView {
     id: String,
     title: String,
@@ -85,8 +86,8 @@ struct Relationship {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct RelationshipAttributes {
-    #[serde(rename = "fileName")]
     file_name: Option<String>,
 }
 

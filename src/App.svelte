@@ -2,6 +2,7 @@
   import router from "./router/router";
   import type { Route } from "./router/router";
   import { onDestroy } from "svelte";
+  import "ress/dist/ress.min.css";
 
   let route: Route;
 
@@ -48,6 +49,5 @@
   main {
     text-align: center;
     padding: 1em;
-    margin: 0 auto;
   }
 </style>
