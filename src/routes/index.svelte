@@ -5,10 +5,10 @@
   import TextField from "@smui/textfield";
   import Ripple from "@smui/ripple";
 
-  import Flag from "src/lib/Flag.svelte";
-  import Status from "src/lib/Status.svelte";
-  import { router, Route } from "src/router/router";
-  import { searchResults, selectedManga } from "src/store";
+  import Flag from "$lib/components/Flag.svelte";
+  import Status from "$lib/components/Status.svelte";
+  import { searchResults } from "$lib/store";
+  import { goto } from "$app/navigation";
 
   let query = "";
   const loading = searchResults.loading;
@@ -18,8 +18,7 @@
   }
 
   function toMangaPage(id: string) {
-    selectedManga.set(id);
-    router.navigate(Route.Title);
+    goto(`/manga/${id}`);
   }
 </script>
 

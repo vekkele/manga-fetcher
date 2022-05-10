@@ -1,7 +1,6 @@
 import { writable } from "svelte/store";
-import { MangaView, search } from "./commands";
-
-export const selectedManga = writable<string | null>();
+import { search } from "$lib/commands";
+import type { MangaView } from "$lib/commands";
 
 function createSearchResults() {
   const { subscribe, set } = writable<MangaView[] | null>();

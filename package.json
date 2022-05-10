@@ -4,14 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "preview": "svelte-kit preview",
+    "kit": "svelte-kit",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri",
     "prepare": "yarn smui-theme-light && yarn smui-theme-dark",
-    "smui-theme-light": "smui-theme compile public/smui.css -i src/theme",
-    "smui-theme-dark": "smui-theme compile public/smui-dark.css -i src/theme/dark"
+    "smui-theme-light": "smui-theme compile src/theme/smui.css -i src/theme",
+    "smui-theme-dark": "smui-theme compile src/theme/smui-dark.css -i src/theme/dark"
   },
   "devDependencies": {
     "@smui/button": "^6.0.0-beta.16",
@@ -19,7 +20,8 @@
     "@smui/linear-progress": "^6.0.0-beta.16",
     "@smui/ripple": "^6.0.0-beta.16",
     "@smui/textfield": "^6.0.0-beta.16",
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
+    "@sveltejs/adapter-static": "^1.0.0-next.29",
+    "@sveltejs/kit": "^1.0.0-next.326",
     "@tauri-apps/cli": "^1.0.0-rc.9",
     "@tsconfig/svelte": "^2.0.1",
     "smui-theme": "^6.0.0-beta.16",
@@ -28,9 +30,7 @@
     "svelte-material-ui": "^6.0.0-beta.16",
     "svelte-preprocess": "^4.9.8",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.4",
-    "vite": "^2.9.7",
-    "vite-tsconfig-paths": "^3.4.1"
+    "typescript": "^4.5.4"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.0-rc.4",

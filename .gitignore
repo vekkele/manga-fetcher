@@ -12,7 +12,8 @@ dist
 dist-ssr
 *.local
 
-public/smui*.css
+src/theme/smui*.css
+.svelte-kit
 
 # Editor directories and files
 .vscode/*

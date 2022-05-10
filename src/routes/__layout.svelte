@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { page } from "./router/router";
   import { onDestroy } from "svelte";
   import "ress/dist/ress.min.css";
+  import "../theme/smui-dark.css";
 
   const darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
-  let dark = darkMedia.matches;
+  let dark = darkMedia.matches; //TODO: Handle light/dark theme
 
   function onDarkChange(e: MediaQueryListEvent) {
     dark = e.matches;
@@ -16,18 +16,8 @@
   });
 </script>
 
-<svelte:head>
-  <!-- SMUI Styles -->
-  {#if dark}
-    <link rel="stylesheet" href="/smui-dark.css" />
-  {:else}
-    <link rel="stylesheet" href="/smui.css" />
-  {/if}
-</svelte:head>
-
-<svelte:body class="light-theme" />
 <main>
-  <svelte:component this={$page} />
+  <slot />
 </main>
 
 <style>
