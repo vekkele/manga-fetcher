@@ -17,6 +17,7 @@
     "@smui/button": "^6.0.0-beta.16",
     "@smui/card": "^6.0.0-beta.16",
     "@smui/linear-progress": "^6.0.0-beta.16",
+    "@smui/ripple": "^6.0.0-beta.16",
     "@smui/textfield": "^6.0.0-beta.16",
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tauri-apps/cli": "^1.0.0-rc.9",

@@ -2,7 +2,7 @@
 import SearchSvelte from "src/pages/Search.svelte";
 import TitleSvelte from "src/pages/Title.svelte";
 import type { SvelteComponent } from "svelte";
-import { writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 
 export enum Route {
   Search = 'search',
@@ -19,15 +19,15 @@ const routes: Routes = {
 }
 
 function createRoutes() {
-  const { subscribe, set } = writable(Route.Search);
+  const store = writable(Route.Search);
 
   return {
-    subscribe,
+    store,
     routes,
-    navigate: (route: Route) => set(route),
+    navigate: (route: Route) => store.set(route),
   }
 }
 
-const router = createRoutes();
+export const router = createRoutes();
 
-export default router
+export const page = derived(router.store, $route => routes[$route]);

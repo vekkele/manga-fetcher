@@ -3,22 +3,22 @@
   import Card from "@smui/card";
   import LinearProgress from "@smui/linear-progress";
   import TextField from "@smui/textfield";
+  import Ripple from "@smui/ripple";
 
-  import { search, MangaView } from "src/commands";
   import Flag from "src/lib/Flag.svelte";
   import Status from "src/lib/Status.svelte";
-  import router, { Route } from "src/router/router";
+  import { router, Route } from "src/router/router";
+  import { searchResults, selectedManga } from "src/store";
 
   let query = "";
-  let titlesPromise: Promise<MangaView[]>;
+  const loading = searchResults.loading;
 
   function submit() {
-    if (query === "") return;
-
-    titlesPromise = search(query);
+    searchResults.search(query);
   }
 
-  function toTitle() {
+  function toMangaPage(id: string) {
+    selectedManga.set(id);
     router.navigate(Route.Title);
   }
 </script>
@@ -31,44 +31,45 @@
     bind:value={query}
   />
   <Button class="search-button" on:click={submit}>Search</Button>
-  <Button class="search-button" on:click={toTitle}>To Title</Button>
 </section>
 
-{#if titlesPromise}
-  {#await titlesPromise}
-    <LinearProgress indeterminate />
-  {:then mangaList}
-    <section class="result-section">
-      {#if mangaList.length === 0}
-        <h2>No Results</h2>
-      {/if}
-      {#each mangaList as manga}
-        <Card class="card">
-          <div class="card-body">
-            <img
-              src={manga.coverUrl}
-              alt="manga cover"
-              height="150"
-              width="100"
-            />
-            <div class="card-content">
-              <div class="title-section">
-                <h3 class="title">{manga.title}</h3>
-                <Status status={manga.status} />
-              </div>
-              <div class="information">
-                <div class="lang-grid">
-                  {#each manga.langCodes.slice(0, 9) as code}
-                    <Flag {code} />
-                  {/each}
-                </div>
+{#if $loading}
+  <LinearProgress indeterminate />
+{:else}
+  <section class="result-section">
+    {#if $searchResults?.length === 0}
+      <h2>No Results</h2>
+    {/if}
+    {#each $searchResults ?? [] as manga}
+      <Card class="card">
+        <div
+          class="card-body"
+          use:Ripple={{ surface: true }}
+          on:click={() => toMangaPage(manga.id)}
+        >
+          <img
+            src={manga.coverUrl}
+            alt="manga cover"
+            height="150"
+            width="100"
+          />
+          <div class="card-content">
+            <div class="title-section">
+              <h3 class="title">{manga.title}</h3>
+              <Status status={manga.status} />
+            </div>
+            <div class="information">
+              <div class="lang-grid">
+                {#each manga.langCodes.slice(0, 9) as code}
+                  <Flag {code} />
+                {/each}
               </div>
             </div>
           </div>
-        </Card>
-      {/each}
-    </section>
-  {/await}
+        </div>
+      </Card>
+    {/each}
+  </section>
 {/if}
 
 <style lang="scss">
@@ -104,6 +105,7 @@
     .card-body {
       display: flex;
       width: 100%;
+      border-radius: inherit;
 
       .card-content {
         display: flex;

@@ -1,10 +1,7 @@
 <script lang="ts">
-  import router from "./router/router";
-  import type { Route } from "./router/router";
+  import { page } from "./router/router";
   import { onDestroy } from "svelte";
   import "ress/dist/ress.min.css";
-
-  let route: Route;
 
   const darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
   let dark = darkMedia.matches;
@@ -17,13 +14,6 @@
   onDestroy(() => {
     darkMedia.removeEventListener("change", onDarkChange);
   });
-
-  router.subscribe((r) => {
-    console.log({ r });
-    route = r;
-  });
-
-  $: component = router.routes[route];
 </script>
 
 <svelte:head>
@@ -37,7 +27,7 @@
 
 <svelte:body class="light-theme" />
 <main>
-  <svelte:component this={component} />
+  <svelte:component this={$page} />
 </main>
 
 <style>
