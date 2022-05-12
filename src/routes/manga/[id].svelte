@@ -1,17 +1,18 @@
 <script lang="ts">
-  import Button from "@smui/button";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
+
+  $: id = $page.params["id"];
 
   function back() {
     goto("/");
   }
 </script>
 
-<Button on:click={back}>To Search</Button>
+<button class="btn" on:click={back}>To Search</button>
 
-{#if !back}
+{#if !id}
   <h1>Invalid selectd manga</h1>
 {:else}
-  <h1>Title info {JSON.stringify($page)}</h1>
+  <h1>Title info {id}</h1>
 {/if}

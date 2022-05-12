@@ -8,7 +8,11 @@
 </script>
 
 {#if hasError}
-  <caption>{code}</caption>
+  <span
+    class="flex items-center justify-center w-5 h-5 rounded bg-primary text-white"
+  >
+    {code}
+  </span>
 {:else}
   <img
     src={`https://mangadex.org/flags/${code}.svg`}
@@ -17,15 +21,3 @@
     on:error={handleError}
   />
 {/if}
-
-<style lang="scss">
-  @use "@material/theme/color-palette" as scheme;
-
-  caption {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background-color: scheme.$green-500;
-    border-radius: 4px;
-  }
-</style>
