@@ -2,17 +2,12 @@
   import Flag from "$lib/components/Flag.svelte";
   import Status from "$lib/components/Status.svelte";
   import { mangaList } from "$lib/store";
-  import { goto } from "$app/navigation";
 
   let query = "";
   const loading = mangaList.loading;
 
   function submit() {
     mangaList.search(query);
-  }
-
-  function toMangaPage(id: string) {
-    goto(`/manga/${id}`);
   }
 </script>
 
@@ -55,15 +50,15 @@
       {/if}
       {#each $mangaList as manga}
         <div class="manga-entry card card-side bg-base-300 shadow-xl h-36">
-          <div class="relative" on:click={() => toMangaPage(manga.id)}>
+          <div class="relative">
             <img
               class="w-24 max-w-none object-cover h-full"
               src={manga.coverUrl}
               alt="manga cover"
             />
-            <div class="img-overlay">
+            <a class="img-overlay" href={`manga/${manga.id}`}>
               <span class="overlay-text">Open</span>
-            </div>
+            </a>
           </div>
 
           <div class="w-full min-w-0  p-2">
