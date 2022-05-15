@@ -10,7 +10,7 @@ export type MangaView = {
   langCodes: string[]
 }
 
-export async function search(query: string): Promise<MangaView[]> {
+export async function search(query: string) {
   try {
     const views: MangaView[] = await invoke('search', { query });
     debug(`received search results: ${JSON.stringify(views, null, 4)}`);
@@ -21,3 +21,55 @@ export async function search(query: string): Promise<MangaView[]> {
   }
 }
 
+export type Manga = {
+  view: MangaView
+  description?: string,
+  genres: string[],
+  year?: number,
+  avg_score?: number,
+  author?: string,
+}
+
+export async function getManga(id: string) {
+  try {
+    const manga: Manga = await invoke('get_manga', { id });
+    debug(`received manga: ${JSON.stringify(manga, null, 4)}`);
+    return manga;
+  } catch (e) {
+    error(`failed to invoke command "getManga": ${JSON.stringify(e, null, 4)}`);
+    return undefined;
+  }
+
+}
+
+export type GetChapterProps = {
+  mangaId: string
+  lang: string
+  limit: number
+  offset: number
+}
+
+export type Chapter = {
+  id: string
+  chapter: string
+  volume?: string
+  title?: string
+  scanGroup?: ScanGroup
+  pages: number
+}
+
+export type ScanGroup = {
+  name: string,
+  id: string,
+}
+
+export async function getChapters(props: GetChapterProps) {
+  try {
+    const chapters: Chapter[] = await invoke('get_chapters', props);
+    debug(`received chapters: ${JSON.stringify(chapters, null, 4)}`);
+    return chapters;
+  } catch (e) {
+    error(`failed to invoke command "getChapters": ${JSON.stringify(e, null, 4)}`);
+    return [];
+  }
+}

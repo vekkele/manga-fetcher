@@ -19,7 +19,11 @@ fn main() {
                 ])
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![commands::search])
+        .invoke_handler(tauri::generate_handler![
+            commands::search,
+            commands::get_manga,
+            commands::get_chapters,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

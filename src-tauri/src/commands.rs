@@ -1,41 +1,48 @@
+use std::result;
+
 use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::model;
+use crate::model::Chapter;
+use crate::model::{self, Manga};
 use crate::service;
 
 #[derive(Debug, Error, Serialize)]
-pub enum SearchError {
-    #[error("provided query is empty")]
-    EmptyQuery,
-    #[error("internal app error")]
-    Internal,
+pub enum CommandError {
+    #[error("invalid arguments: {}", .0)]
+    InvalidArguments(String),
+    #[error("internal app error: {}", .0)]
+    Internal(String),
 }
 
-impl From<service::SearchError> for SearchError {
-    fn from(e: service::SearchError) -> Self {
-        use service::SearchError::*;
+impl From<model::ServiceError> for CommandError {
+    fn from(e: model::ServiceError) -> Self {
+        use model::ServiceError::*;
 
         match e {
-            EmptyQuery => Self::EmptyQuery,
-            _ => Self::Internal,
+            InvalidArguments(e) => Self::InvalidArguments(e),
+            e => Self::Internal(e.to_string()),
         }
     }
+}
+
+pub type Result<T> = result::Result<T, CommandError>;
+
+#[tauri::command]
+pub fn search(query: &str) -> Result<Vec<model::MangaView>> {
+    debug!("searching for \"{query}\"");
+
+    Ok(service::search(query)?)
 }
 
 #[tauri::command]
-pub fn search(query: &str) -> Result<Vec<model::MangaView>, SearchError> {
-    debug!("searching for \"{query}\"");
+pub fn get_manga(id: &str) -> Result<Manga> {
+    Ok(service::get_manga(id)?)
+}
 
-    match service::search(query) {
-        Ok(res) => {
-            debug!("success. Found {} entries", res.len());
-            Ok(res)
-        }
-        Err(e) => {
-            error!("failed to search: {e}");
-            Err(SearchError::from(e))
-        }
-    }
+#[tauri::command]
+pub fn get_chapters(manga_id: &str, lang: &str, limit: u32, offset: u32) -> Result<Vec<Chapter>> {
+    debug!("getting chapters: {manga_id}");
+    Ok(service::fetch_feed(manga_id, lang, limit, offset)?)
 }
