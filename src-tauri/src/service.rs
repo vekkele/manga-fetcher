@@ -2,6 +2,7 @@ use log::{debug, error};
 use thiserror::Error;
 
 use crate::constants::MANGADEX_API;
+
 use crate::model::{
     ApiResponse, Chapter, FeedData, Manga, MangaData, MangaStatistics, MangaView, ResponseError,
     Result, ServiceError, StatisticsResponse,

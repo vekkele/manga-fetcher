@@ -4,8 +4,7 @@ use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::model::Chapter;
-use crate::model::{self, Manga};
+use crate::model::{Chapter, Manga, MangaView, ServiceError};
 use crate::service;
 
 #[derive(Debug, Error, Serialize)]
@@ -16,9 +15,9 @@ pub enum CommandError {
     Internal(String),
 }
 
-impl From<model::ServiceError> for CommandError {
-    fn from(e: model::ServiceError) -> Self {
-        use model::ServiceError::*;
+impl From<ServiceError> for CommandError {
+    fn from(e: ServiceError) -> Self {
+        use ServiceError::*;
 
         match e {
             InvalidArguments(e) => Self::InvalidArguments(e),
@@ -30,7 +29,7 @@ impl From<model::ServiceError> for CommandError {
 pub type Result<T> = result::Result<T, CommandError>;
 
 #[tauri::command]
-pub fn search(query: &str) -> Result<Vec<model::MangaView>> {
+pub fn search(query: &str) -> Result<Vec<MangaView>> {
     debug!("searching for \"{query}\"");
 
     Ok(service::search(query)?)
