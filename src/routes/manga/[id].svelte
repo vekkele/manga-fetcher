@@ -30,15 +30,17 @@
 
 <button class="btn" on:click={back}>To Search</button>
 
-{#if !id}
-  <h1>Invalid selectd manga</h1>
-{:else}
-  <h1>Title info {id}</h1>
-  <button class="btn btn-primary" on:click={fetchData}>Get Manga</button>
+<section class="flex">
+  <div>
+    <img src="" alt="" />
+  </div>
+</section>
 
-  <h2>Manga</h2>
-  <pre>{JSON.stringify(manga, null, 2)}</pre>
+<h1>Title info {id}</h1>
+<button class="btn btn-primary" on:click={fetchData}>Get Manga</button>
 
-  <h2>Chapters</h2>
-  <pre>{JSON.stringify(chapters, null, 2)}</pre>
-{/if}
+<h2>Manga</h2>
+<pre>{JSON.stringify(manga, null, 2)}</pre>
+
+<h2>Chapters</h2>
+<pre>{JSON.stringify(chapters, null, 2)}</pre>

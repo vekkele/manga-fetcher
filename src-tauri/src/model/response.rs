@@ -8,6 +8,9 @@ pub struct ApiResponse<T> {
     pub result: String,
     pub data: Option<T>,
     pub errors: Option<Vec<ResponseError>>,
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
+    pub total: Option<u32>,
 }
 
 impl<T> ApiResponse<T> {
@@ -30,6 +33,17 @@ pub struct ResponseError {
     status: u32,
     title: String,
     detail: String,
+}
+
+impl ResponseError {
+    pub fn new(status: u32, title: &str, detail: &str) -> Self {
+        Self {
+            id: Default::default(),
+            status,
+            title: title.to_owned(),
+            detail: detail.to_owned(),
+        }
+    }
 }
 
 impl Default for ResponseError {
@@ -56,6 +70,9 @@ pub enum ServiceError {
 
     #[error("failed http requests")]
     HttpError(#[from] reqwest::Error),
+
+    #[error("something went wrong: {}", .0)]
+    Internal(String),
 }
 
 pub type Result<T> = result::Result<T, ServiceError>;

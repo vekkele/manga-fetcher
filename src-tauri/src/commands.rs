@@ -4,7 +4,7 @@ use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::model::{Chapter, Manga, MangaView, ServiceError};
+use crate::model::{ChaptersResponse, Manga, MangaView, ServiceError};
 use crate::service;
 
 #[derive(Debug, Error, Serialize)]
@@ -41,7 +41,12 @@ pub fn get_manga(id: &str) -> Result<Manga> {
 }
 
 #[tauri::command]
-pub fn get_chapters(manga_id: &str, lang: &str, limit: u32, offset: u32) -> Result<Vec<Chapter>> {
+pub fn get_chapters(
+    manga_id: &str,
+    lang: &str,
+    limit: u32,
+    offset: u32,
+) -> Result<ChaptersResponse> {
     debug!("getting chapters: {manga_id}");
     Ok(service::fetch_feed(manga_id, lang, limit, offset)?)
 }

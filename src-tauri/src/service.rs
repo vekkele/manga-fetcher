@@ -4,8 +4,8 @@ use thiserror::Error;
 use crate::constants::MANGADEX_API;
 
 use crate::model::{
-    ApiResponse, Chapter, FeedData, Manga, MangaData, MangaStatistics, MangaView, ResponseError,
-    Result, ServiceError, StatisticsResponse,
+    ApiResponse, ChaptersResponse, FeedData, Manga, MangaData, MangaStatistics, MangaView,
+    ResponseError, Result, ServiceError, StatisticsResponse,
 };
 
 #[derive(Error, Debug)]
@@ -59,23 +59,10 @@ fn fetch_statistitcs(id: &str) -> Result<MangaStatistics> {
     Ok(stats)
 }
 
-pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<Vec<Chapter>> {
+pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<ChaptersResponse> {
     let feed_url = format!("{MANGADEX_API}/manga/{id}/feed?limit={limit}&offset={offset}&translatedLanguage[]={lang}&includes[]=scanlation_group&order[volume]=asc&order[chapter]=asc");
     let res: ApiResponse<Vec<FeedData>> = reqwest::blocking::get(feed_url)?.json()?;
-    let feed_data = res.result("feed")?;
+    let response: ChaptersResponse = res.try_into()?;
 
-    let chapters = feed_data
-        .iter()
-        .filter_map(|d| match d.attributes.external_url {
-            None => Some(Chapter::from(d)),
-            Some(_) => None,
-        })
-        .collect();
-
-    debug!(
-        "Got {limit} chapters from {offset}th for {id} in {lang} lang: {:#?}",
-        chapters
-    );
-
-    Ok(chapters)
+    Ok(response)
 }
