@@ -23,6 +23,7 @@ fn main() {
             commands::search,
             commands::get_manga,
             commands::get_chapters,
+            commands::download,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

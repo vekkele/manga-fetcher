@@ -50,3 +50,8 @@ pub fn get_chapters(
     debug!("getting chapters: {manga_id}");
     Ok(service::fetch_feed(manga_id, lang, limit, offset)?)
 }
+
+#[tauri::command]
+pub fn download() {
+    service::download_chapter();
+}

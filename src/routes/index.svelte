@@ -2,6 +2,7 @@
   import Flag from "$lib/components/Flag.svelte";
   import Status from "$lib/components/Status.svelte";
   import { mangaList } from "$lib/store";
+  import { downloadChapters } from "$lib/commands";
 
   let query = "";
   const loading = mangaList.loading;
@@ -15,6 +16,7 @@
   <label class="label" for="search-input">
     <span class="label-text">Search Query</span>
   </label>
+  <button class="btn btn-primary" on:click={downloadChapters}>download</button>
   <div class="input-group">
     <input
       id="search-input"

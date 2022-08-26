@@ -73,3 +73,12 @@ export async function getChapters(props: GetChapterProps) {
     return [];
   }
 }
+
+export async function downloadChapters() {
+  try {
+    await invoke('download');
+    debug(`file downloaded`);
+  } catch (e) {
+    error(`failed to invoke command "download": ${JSON.stringify(e, null, 4)}`);
+  }
+}

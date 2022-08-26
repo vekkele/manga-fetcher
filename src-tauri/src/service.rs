@@ -1,11 +1,13 @@
+use std::fs::File;
+
 use log::{debug, error};
 use thiserror::Error;
 
 use crate::constants::MANGADEX_API;
 
 use crate::model::{
-    ApiResponse, ChaptersResponse, FeedData, Manga, MangaData, MangaStatistics, MangaView,
-    ResponseError, Result, ServiceError, StatisticsResponse,
+    ApiResponse, AtHomeResponse, ChaptersResponse, FeedData, Manga, MangaData, MangaStatistics,
+    MangaView, ResponseError, Result, ServiceError, StatisticsResponse,
 };
 
 #[derive(Error, Debug)]
@@ -65,4 +67,25 @@ pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<Chapt
     let response: ChaptersResponse = res.try_into()?;
 
     Ok(response)
+}
+
+//FIXME: Remove
+const CHAPTER_ID: &str = "a54c491c-8e4c-4e97-8873-5b79e59da210";
+
+pub fn download_chapter() -> Result<String> {
+    let at_home_url = format!("{MANGADEX_API}/at-home/server/{CHAPTER_ID}");
+    let res: AtHomeResponse = reqwest::blocking::get(at_home_url)?.json()?;
+
+    let base_url = res.base_url;
+    let hash = res.chapter.hash;
+
+    for file_name in res.chapter.data_saver {
+        let frame_url = format!("{base_url}/data-saver/{hash}/{file_name}");
+
+        let mut frame_file = File::create(file_name).unwrap();
+
+        reqwest::blocking::get(frame_url)?.copy_to(&mut frame_file)?;
+    }
+
+    Ok("".to_owned())
 }
