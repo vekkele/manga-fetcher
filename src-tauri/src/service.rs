@@ -72,7 +72,7 @@ pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<Chapt
 //FIXME: Remove
 const CHAPTER_ID: &str = "a54c491c-8e4c-4e97-8873-5b79e59da210";
 
-pub fn download_chapter() -> Result<String> {
+pub fn download_chapter() -> Result<()> {
     let at_home_url = format!("{MANGADEX_API}/at-home/server/{CHAPTER_ID}");
     let res: AtHomeResponse = reqwest::blocking::get(at_home_url)?.json()?;
 
@@ -81,11 +81,10 @@ pub fn download_chapter() -> Result<String> {
 
     for file_name in res.chapter.data_saver {
         let frame_url = format!("{base_url}/data-saver/{hash}/{file_name}");
-
-        let mut frame_file = File::create(file_name).unwrap();
+        let mut frame_file = File::create(file_name)?;
 
         reqwest::blocking::get(frame_url)?.copy_to(&mut frame_file)?;
     }
 
-    Ok("".to_owned())
+    Ok(())
 }

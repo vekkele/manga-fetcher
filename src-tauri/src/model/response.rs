@@ -1,4 +1,4 @@
-use std::result;
+use std::{io, result};
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -73,6 +73,9 @@ pub enum ServiceError {
 
     #[error("something went wrong: {}", .0)]
     Internal(String),
+
+    #[error("failed file operation")]
+    FSError(#[from] io::Error),
 }
 
 pub type Result<T> = result::Result<T, ServiceError>;
