@@ -52,7 +52,7 @@ pub fn get_chapters(
 }
 
 #[tauri::command]
-pub fn download() -> Result<()> {
-    service::download_chapter()?;
+pub async fn download() -> Result<()> {
+    service::download_chapter().await?;
     Ok(())
 }
