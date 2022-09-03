@@ -76,6 +76,9 @@ pub enum ServiceError {
 
     #[error("failed file operation")]
     FSError(#[from] io::Error),
+
+    #[error("failed to create zip archive")]
+    ZipError(#[from] zip::result::ZipError),
 }
 
 pub type Result<T> = result::Result<T, ServiceError>;

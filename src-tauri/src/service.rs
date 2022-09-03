@@ -1,9 +1,11 @@
 use std::fs;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
 use futures::stream::{self, StreamExt};
 use log::{debug, error, info};
 use thiserror::Error;
+use zip::write::FileOptions;
 
 use crate::constants::MANGADEX_API;
 
@@ -102,6 +104,8 @@ pub async fn download_chapter() -> Result<()> {
         })
         .await;
 
+    write_zip(chapter_path)?;
+
     Ok(())
 }
 
@@ -126,4 +130,40 @@ async fn download_frame(
     fs::write(file_path, file_data)?;
 
     Ok(file_name)
+}
+
+fn write_zip(chapter_path: &Path) -> Result<()> {
+    let zip_path = chapter_path.with_file_name("chapter.cbz");
+    let zip_file = fs::File::create(zip_path)?;
+
+    let mut writer = zip::ZipWriter::new(zip_file);
+
+    let method = zip::CompressionMethod::Stored;
+    let options = FileOptions::default()
+        .compression_method(method)
+        .unix_permissions(0o755);
+
+    let mut buffer = Vec::new();
+
+    for entry in fs::read_dir(chapter_path)? {
+        let entry = entry?;
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+
+        let file_name = path.strip_prefix(chapter_path).unwrap().to_str().unwrap();
+        writer.start_file(file_name, options)?;
+
+        let mut f = fs::File::open(path)?;
+        f.read_to_end(&mut buffer)?;
+        writer.write_all(&*buffer)?;
+        buffer.clear()
+    }
+
+    writer.finish()?;
+
+    fs::remove_dir_all(chapter_path)?;
+
+    Ok(())
 }
