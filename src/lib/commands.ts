@@ -49,6 +49,35 @@ export type GetChapterProps = {
   offset: number
 }
 
+export type ChaptersResponse = {
+  chapters: Chapter[]
+  limit: number
+  offset: number
+  total: number
+}
+
+export class ChapterPage {
+  chapters: Chapter[]
+  limit: number
+  offset: number
+  total: number
+
+  constructor(res: ChaptersResponse) {
+    this.chapters = res.chapters;
+    this.limit = res.limit;
+    this.offset = res.offset;
+    this.total = res.total;
+  }
+
+  public get pages(): number {
+    return Math.ceil(this.total / this.limit);
+  }
+
+  public get currentPage(): number {
+    return this.offset / this.limit + 1;
+  }
+}
+
 export type Chapter = {
   id: string
   chapter: string
@@ -65,12 +94,12 @@ export type ScanGroup = {
 
 export async function getChapters(props: GetChapterProps) {
   try {
-    const chapters: Chapter[] = await invoke('get_chapters', props);
+    const chapters: ChaptersResponse = await invoke('get_chapters', props);
     debug(`received chapters: ${JSON.stringify(chapters, null, 4)}`);
-    return chapters;
+    return new ChapterPage(chapters);
   } catch (e) {
     error(`failed to invoke command "getChapters": ${JSON.stringify(e, null, 4)}`);
-    return [];
+    return undefined;
   }
 }
 
