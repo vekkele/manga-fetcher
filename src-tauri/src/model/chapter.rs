@@ -33,10 +33,7 @@ impl TryFrom<ApiResponse<Vec<FeedData>>> for ChaptersResponse {
         let feed_data = value.result(TAG)?;
 
         Ok(ChaptersResponse {
-            chapters: feed_data
-                .iter()
-                .filter_map(|d| Chapter::try_from(d).ok())
-                .collect(),
+            chapters: feed_data.iter().map(Chapter::from).collect(),
             limit,
             offset,
             total,
@@ -55,10 +52,8 @@ pub struct Chapter {
     pages: u32,
 }
 
-impl TryFrom<&FeedData> for Chapter {
-    type Error = ServiceError;
-
-    fn try_from(data: &FeedData) -> Result<Chapter, Self::Error> {
+impl From<&FeedData> for Chapter {
+    fn from(data: &FeedData) -> Chapter {
         let scan_group = data
             .relationships
             .iter()
@@ -70,20 +65,14 @@ impl TryFrom<&FeedData> for Chapter {
                 _ => None,
             });
 
-        if data.attributes.external_url.is_some() {
-            return Err(ServiceError::Internal(
-                "external links are not supported".to_owned(),
-            ));
-        }
-
-        Ok(Chapter {
+        Chapter {
             id: data.id.to_owned(),
             chapter: data.attributes.chapter.to_owned(),
             volume: data.attributes.volume.to_owned(),
             title: data.attributes.title.to_owned(),
             pages: data.attributes.pages,
             scan_group,
-        })
+        }
     }
 }
 
