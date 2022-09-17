@@ -1,5 +1,7 @@
 import { invoke } from "@tauri-apps/api";
+import { get } from "svelte/store";
 import { debug, error } from 'tauri-plugin-log-api';
+import { selectedChapters } from "./store";
 
 
 export type MangaView = {
@@ -105,7 +107,8 @@ export async function getChapters(props: GetChapterProps) {
 
 export async function downloadChapters() {
   try {
-    await invoke('download');
+    const chapters = get(selectedChapters);
+    await invoke('download', { chapters });
     debug(`file downloaded`);
   } catch (e) {
     error(`failed to invoke command "download": ${JSON.stringify(e, null, 4)}`);

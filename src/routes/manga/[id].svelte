@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import {
     ChapterPage,
+    downloadChapters,
     getChapters,
     getManga,
     type Manga,
@@ -55,6 +56,7 @@
 
 <h1>Title info {id}</h1>
 <button class="btn btn-primary" on:click={fetchData}>Get Manga</button>
+<button class="btn btn-primary" on:click={downloadChapters}>download</button>
 
 {#if chapterPage}
   {#each chapterPage.chapters as chapter}

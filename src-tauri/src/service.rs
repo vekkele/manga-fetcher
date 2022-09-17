@@ -73,20 +73,34 @@ pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<Chapt
     Ok(response)
 }
 
-//FIXME: Remove
-const CHAPTER_ID: &str = "a54c491c-8e4c-4e97-8873-5b79e59da210";
+pub async fn download(chapters: Vec<String>) -> Result<()> {
+    let stream = stream::iter(chapters)
+        .map(download_chapter)
+        .buffer_unordered(100);
 
-pub async fn download_chapter() -> Result<()> {
+    stream
+        .for_each(|e| async {
+            match e {
+                Ok(_) => info!("Successfully downloaded some chapter"),
+                Err(e) => error!("Failed to download {e}"),
+            };
+        })
+        .await;
+
+    Ok(())
+}
+
+pub async fn download_chapter(chapter_id: String) -> Result<()> {
     const CONCURRENT_FRAMES: usize = 30;
 
-    let at_home_url = format!("{MANGADEX_API}/at-home/server/{CHAPTER_ID}");
+    let at_home_url = format!("{MANGADEX_API}/at-home/server/{chapter_id}");
     let res: AtHomeResponse = reqwest::get(at_home_url).await?.json().await?;
 
     let base_url = res.base_url;
     let hash = res.chapter.hash;
 
     let client = reqwest::Client::new();
-    let chapter_path_buf = get_chapter_path();
+    let chapter_path_buf = get_chapter_path(&chapter_id);
     let chapter_path = chapter_path_buf.as_path();
 
     fs::create_dir_all(chapter_path)?;
@@ -104,15 +118,15 @@ pub async fn download_chapter() -> Result<()> {
         })
         .await;
 
-    write_zip(chapter_path)?;
+    write_zip(chapter_path, &chapter_id)?;
 
     Ok(())
 }
 
-fn get_chapter_path() -> PathBuf {
+fn get_chapter_path(chapter_name: &str) -> PathBuf {
     let mut chapter_path_buf =
         tauri::api::path::download_dir().expect("downloads path must be present");
-    chapter_path_buf.push("chapter");
+    chapter_path_buf.push(chapter_name);
     chapter_path_buf.to_owned()
 }
 
@@ -132,8 +146,8 @@ async fn download_frame(
     Ok(file_name)
 }
 
-fn write_zip(chapter_path: &Path) -> Result<()> {
-    let zip_path = chapter_path.with_file_name("chapter.cbz");
+fn write_zip(chapter_path: &Path, chapter_name: &str) -> Result<()> {
+    let zip_path = chapter_path.with_file_name(format!("{chapter_name}.cbz"));
     let zip_file = fs::File::create(zip_path)?;
 
     let mut writer = zip::ZipWriter::new(zip_file);
