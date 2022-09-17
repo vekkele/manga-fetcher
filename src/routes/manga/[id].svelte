@@ -7,11 +7,14 @@
     getManga,
     type Manga,
   } from "$lib/commands";
+  import ChapterItem from "$lib/components/ChapterItem.svelte";
   import ChaptersPagination from "$lib/components/ChaptersPagination.svelte";
+  import { selectedChapters } from "$lib/store";
 
   $: id = $page.params["id"];
 
   function back() {
+    selectedChapters.clear();
     goto("/");
   }
 
@@ -55,11 +58,7 @@
 
 {#if chapterPage}
   {#each chapterPage.chapters as chapter}
-    <div>
-      {`Chapter ${chapter.chapter}${
-        chapter.title ? ` - ${chapter.title}` : ""
-      }`}
-    </div>
+    <ChapterItem {chapter} />
   {/each}
 
   <ChaptersPagination
@@ -68,6 +67,11 @@
     {fetchPage}
   />
 {/if}
+
+<h2>Selected Chapters:</h2>
+{#each $selectedChapters as ch, i}
+  <div>{i}: {ch}</div>
+{/each}
 
 <h2>Manga</h2>
 <pre>{JSON.stringify(manga, null, 2)}</pre>
