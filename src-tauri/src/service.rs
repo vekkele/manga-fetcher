@@ -1,3 +1,4 @@
+use std::ffi::OsStr;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -105,8 +106,21 @@ pub async fn download_chapter(chapter_id: String) -> Result<()> {
 
     fs::create_dir_all(chapter_path)?;
 
-    let stream = stream::iter(res.chapter.data_saver)
-        .map(|file_name| download_frame(file_name, &client, &base_url, &hash, chapter_path))
+    let frame_urls = res.chapter.data_saver;
+    let total_frames = frame_urls.len();
+    let stream = stream::iter(frame_urls)
+        .enumerate()
+        .map(|(index, file_name)| {
+            download_frame(
+                file_name,
+                &client,
+                &base_url,
+                &hash,
+                chapter_path,
+                index,
+                total_frames,
+            )
+        })
         .buffer_unordered(CONCURRENT_FRAMES);
 
     stream
@@ -130,15 +144,32 @@ fn get_chapter_path(chapter_name: &str) -> PathBuf {
     chapter_path_buf.to_owned()
 }
 
+fn get_frame_name(file_name: &str, frame_index: usize, total_frames: usize) -> String {
+    let ext = Path::new(file_name)
+        .extension()
+        .and_then(OsStr::to_str)
+        .unwrap_or("jpg");
+    let pad_width = get_pad_width(total_frames);
+
+    format!("{:0width$}.{ext}", frame_index, width = pad_width)
+}
+
+fn get_pad_width(max_num: usize) -> usize {
+    max_num.to_string().len()
+}
+
 async fn download_frame(
     file_name: String,
     client: &reqwest::Client,
     base_url: &str,
     hash: &str,
     chapter_path: &Path,
+    frame_index: usize,
+    total_frames: usize,
 ) -> Result<String> {
     let frame_url = format!("{base_url}/data-saver/{hash}/{file_name}");
-    let file_path = chapter_path.join(&file_name);
+    let frame_name = get_frame_name(&file_name, frame_index, total_frames);
+    let file_path = chapter_path.join(&frame_name);
     let file_data = client.get(frame_url).send().await?.bytes().await?;
 
     fs::write(file_path, file_data)?;
