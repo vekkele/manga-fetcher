@@ -22,18 +22,23 @@ function createMangaList() {
 
 export const mangaList = createMangaList();
 
+export type ChapterProps = {
+  id: string
+  fullname: string
+}
+
 function createSelectedChapters() {
-  const { subscribe, update, set } = writable<string[]>([]);
-  const add = (id: string) => update(prev => ([...prev, id]));
-  const remove = (id: string) => update(prev => prev.filter(chapterId => chapterId !== id));
+  const { subscribe, update, set } = writable<ChapterProps[]>([]);
+  const add = (chapter: ChapterProps) => update(prev => ([...prev, chapter]));
+  const remove = (id: string) => update(prev => prev.filter(chapter => id !== chapter.id));
 
   return {
     subscribe,
-    toggle: (id: string, selected: boolean) => {
+    toggle: (chapter: ChapterProps, selected: boolean) => {
       if (selected) {
-        remove(id);
+        remove(chapter.id);
       } else {
-        add(id);
+        add(chapter);
       }
     },
     clear: () => set([]),

@@ -4,7 +4,7 @@ use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::model::{ChaptersResponse, Manga, MangaView, ServiceError};
+use crate::model::{ChapterProps, ChaptersResponse, Manga, MangaView, ServiceError};
 use crate::service;
 
 #[derive(Debug, Error, Serialize)]
@@ -52,7 +52,7 @@ pub fn get_chapters(
 }
 
 #[tauri::command]
-pub async fn download(chapters: Vec<String>) -> Result<()> {
+pub async fn download(chapters: Vec<ChapterProps>) -> Result<()> {
     service::download(chapters).await?;
     Ok(())
 }

@@ -58,9 +58,9 @@
 <button class="btn btn-primary" on:click={fetchData}>Get Manga</button>
 <button class="btn btn-primary" on:click={downloadChapters}>download</button>
 
-{#if chapterPage}
+{#if chapterPage && manga}
   {#each chapterPage.chapters as chapter}
-    <ChapterItem {chapter} />
+    <ChapterItem {chapter} mangaName={manga.view.title} />
   {/each}
 
   <ChaptersPagination

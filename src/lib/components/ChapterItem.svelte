@@ -3,9 +3,12 @@
   import { selectedChapters } from "$lib/store";
 
   export let chapter: Chapter;
+  export let mangaName: string;
 
   $: ({ chapter: chapterNum, title, id } = chapter);
-  $: selected = $selectedChapters.includes(id);
+  $: selected = $selectedChapters.some((ch) => ch.id === id);
+  $: chapterName = `Chapter ${chapterNum}${title ? ` - ${title}` : ""}`;
+  $: fullname = `${mangaName} ${chapterName}`;
 
   const { toggle } = selectedChapters;
 </script>
@@ -15,7 +18,7 @@
     type="checkbox"
     class="checkbox mx-2"
     bind:checked={selected}
-    on:change={(e) => toggle(id, e.currentTarget.checked)}
+    on:change={(e) => toggle({ id, fullname }, e.currentTarget.checked)}
   />
   <span class="label-text">
     {`Chapter ${chapterNum}${title ? ` - ${title}` : ""}`}

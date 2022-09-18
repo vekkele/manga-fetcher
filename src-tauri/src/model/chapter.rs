@@ -1,8 +1,14 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::model::ResponseError;
 
 use super::{ApiResponse, FeedData, ServiceError};
+
+#[derive(Deserialize)]
+pub struct ChapterProps {
+    pub id: String,
+    pub fullname: String,
+}
 
 #[derive(Debug, Serialize)]
 pub struct ChaptersResponse {

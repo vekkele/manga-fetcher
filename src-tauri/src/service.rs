@@ -11,8 +11,8 @@ use zip::write::FileOptions;
 use crate::constants::MANGADEX_API;
 
 use crate::model::{
-    ApiResponse, AtHomeResponse, ChaptersResponse, FeedData, Manga, MangaData, MangaStatistics,
-    MangaView, ResponseError, Result, ServiceError, StatisticsResponse,
+    ApiResponse, AtHomeResponse, ChapterProps, ChaptersResponse, FeedData, Manga, MangaData,
+    MangaStatistics, MangaView, ResponseError, Result, ServiceError, StatisticsResponse,
 };
 
 #[derive(Error, Debug)]
@@ -74,7 +74,7 @@ pub fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result<Chapt
     Ok(response)
 }
 
-pub async fn download(chapters: Vec<String>) -> Result<()> {
+pub async fn download(chapters: Vec<ChapterProps>) -> Result<()> {
     let stream = stream::iter(chapters)
         .map(download_chapter)
         .buffer_unordered(100);
@@ -91,9 +91,11 @@ pub async fn download(chapters: Vec<String>) -> Result<()> {
     Ok(())
 }
 
-pub async fn download_chapter(chapter_id: String) -> Result<()> {
+pub async fn download_chapter(chapter: ChapterProps) -> Result<()> {
     const CONCURRENT_FRAMES: usize = 30;
 
+    let chapter_id = chapter.id;
+    let chapter_name = chapter.fullname;
     let at_home_url = format!("{MANGADEX_API}/at-home/server/{chapter_id}");
     let res: AtHomeResponse = reqwest::get(at_home_url).await?.json().await?;
 
@@ -101,7 +103,7 @@ pub async fn download_chapter(chapter_id: String) -> Result<()> {
     let hash = res.chapter.hash;
 
     let client = reqwest::Client::new();
-    let chapter_path_buf = get_chapter_path(&chapter_id);
+    let chapter_path_buf = get_chapter_path(&chapter_name);
     let chapter_path = chapter_path_buf.as_path();
 
     fs::create_dir_all(chapter_path)?;
@@ -132,7 +134,7 @@ pub async fn download_chapter(chapter_id: String) -> Result<()> {
         })
         .await;
 
-    write_zip(chapter_path, &chapter_id)?;
+    write_zip(chapter_path, &chapter_name)?;
 
     Ok(())
 }
