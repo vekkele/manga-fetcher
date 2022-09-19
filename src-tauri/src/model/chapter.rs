@@ -56,6 +56,7 @@ pub struct Chapter {
     title: Option<String>,
     scan_group: Option<ScanGroup>,
     pages: u32,
+    external_url: Option<String>,
 }
 
 impl From<&FeedData> for Chapter {
@@ -77,6 +78,7 @@ impl From<&FeedData> for Chapter {
             volume: data.attributes.volume.to_owned(),
             title: data.attributes.title.to_owned(),
             pages: data.attributes.pages,
+            external_url: data.attributes.external_url.to_owned(),
             scan_group,
         }
     }

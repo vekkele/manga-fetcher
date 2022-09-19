@@ -87,6 +87,7 @@ export type Chapter = {
   title?: string
   scanGroup?: ScanGroup
   pages: number
+  externalUrl?: string
 }
 
 export type ScanGroup = {
