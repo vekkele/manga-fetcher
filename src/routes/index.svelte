@@ -5,8 +5,10 @@
 
   let query = "";
   const loading = mangaList.loading;
+  $: searchDisabled = !query || $loading;
 
   function submit() {
+    if (searchDisabled) return;
     mangaList.search(query);
   }
 </script>
@@ -15,14 +17,19 @@
   <label class="label" for="search-input">
     <span class="label-text">Search Query</span>
   </label>
-  <div class="input-group">
+  <form on:submit|preventDefault={submit} class="input-group">
     <input
       id="search-input"
       type="text"
       class="input input-bordered flex-1"
+      spellcheck="false"
       bind:value={query}
     />
-    <button class="btn btn-square btn-primary" on:click={submit}>
+    <button
+      class="btn btn-square btn-primary"
+      disabled={searchDisabled}
+      type="submit"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -37,7 +44,7 @@
         /></svg
       >
     </button>
-  </div>
+  </form>
 </section>
 
 {#if $mangaList}
