@@ -10,7 +10,9 @@
   } from "$lib/commands";
   import ChapterItem from "$lib/components/ChapterItem.svelte";
   import ChaptersPagination from "$lib/components/ChaptersPagination.svelte";
+  import MangaInfo from "$lib/components/MangaInfo.svelte";
   import { selectedChapters } from "$lib/store";
+  import { onMount } from "svelte";
 
   $: id = $page.params["id"];
 
@@ -23,6 +25,10 @@
   let chapterPage: ChapterPage | undefined;
 
   const limit = 10;
+
+  onMount(() => {
+    fetchData();
+  });
 
   async function fetchData() {
     manga = await getManga(id);
@@ -54,9 +60,17 @@
   </div>
 </section>
 
-<h1>Title info {id}</h1>
-<button class="btn btn-primary" on:click={fetchData}>Get Manga</button>
-<button class="btn btn-primary" on:click={downloadChapters}>download</button>
+{#if manga}
+  <MangaInfo {manga} />
+{/if}
+
+<button
+  class="btn btn-primary my-4"
+  disabled={$selectedChapters.length === 0}
+  on:click={downloadChapters}
+>
+  download
+</button>
 
 {#if chapterPage && manga}
   {#each chapterPage.chapters as chapter}
