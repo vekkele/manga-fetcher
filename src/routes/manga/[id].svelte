@@ -31,13 +31,18 @@
   });
 
   async function fetchData() {
-    manga = await getManga(id);
-    chapterPage = await getChapters({
-      mangaId: id,
-      lang: "en",
-      limit,
-      offset: 0,
-    });
+    const [mangaData, chapters] = await Promise.all([
+      getManga(id),
+      getChapters({
+        mangaId: id,
+        lang: "en",
+        limit,
+        offset: 0,
+      }),
+    ]);
+
+    manga = mangaData;
+    chapterPage = chapters;
   }
 
   async function fetchPage(page: number) {

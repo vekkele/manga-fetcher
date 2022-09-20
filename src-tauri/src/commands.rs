@@ -29,26 +29,26 @@ impl From<ServiceError> for CommandError {
 pub type Result<T> = result::Result<T, CommandError>;
 
 #[tauri::command]
-pub fn search(query: &str) -> Result<Vec<MangaView>> {
+pub async fn search(query: &str) -> Result<Vec<MangaView>> {
     debug!("searching for \"{query}\"");
 
-    Ok(service::search(query)?)
+    Ok(service::search(query).await?)
 }
 
 #[tauri::command]
-pub fn get_manga(id: &str) -> Result<Manga> {
-    Ok(service::get_manga(id)?)
+pub async fn get_manga(id: &str) -> Result<Manga> {
+    Ok(service::get_manga(id).await?)
 }
 
 #[tauri::command]
-pub fn get_chapters(
+pub async fn get_chapters(
     manga_id: &str,
     lang: &str,
     limit: u32,
     offset: u32,
 ) -> Result<ChaptersResponse> {
     debug!("getting chapters: {manga_id}");
-    Ok(service::fetch_feed(manga_id, lang, limit, offset)?)
+    Ok(service::fetch_feed(manga_id, lang, limit, offset).await?)
 }
 
 #[tauri::command]

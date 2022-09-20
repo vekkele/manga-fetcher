@@ -48,7 +48,7 @@
 
 <style lang="postcss">
   .chapter-link:hover {
-    @apply underline;
+    @apply link;
   }
 
   .chapter-select:hover {
