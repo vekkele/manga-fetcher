@@ -46,3 +46,22 @@ function createSelectedChapters() {
 }
 
 export const selectedChapters = createSelectedChapters();
+
+export enum DownloadGroup {
+  chapter = 'Chapter',
+  volume = 'Volume'
+}
+
+function createDownloadGroup() {
+  const { set, ...state } = writable(DownloadGroup.chapter);
+
+  return {
+    ...state,
+    set: (value: DownloadGroup) => {
+      selectedChapters.clear();
+      set(value);
+    }
+  }
+}
+
+export const downloadGroup = createDownloadGroup();

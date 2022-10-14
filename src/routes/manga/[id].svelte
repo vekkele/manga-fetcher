@@ -11,7 +11,8 @@
   import ChapterItem from "$lib/components/ChapterItem.svelte";
   import ChaptersPagination from "$lib/components/ChaptersPagination.svelte";
   import MangaInfo from "$lib/components/MangaInfo.svelte";
-  import { selectedChapters } from "$lib/store";
+  import VolumeItem from "$lib/components/VolumeItem.svelte";
+  import { DownloadGroup, downloadGroup, selectedChapters } from "$lib/store";
   import { onMount } from "svelte";
 
   $: id = $page.params["id"];
@@ -25,6 +26,7 @@
   let chapterPage: ChapterPage | undefined;
 
   const limit = 10;
+  const groupSelectId = "download-group-select";
 
   onMount(() => {
     fetchData();
@@ -69,6 +71,21 @@
   <MangaInfo {manga} />
 {/if}
 
+<div class="form-control w-52 max-w-xs">
+  <label for={groupSelectId} class="label">
+    <span class="label-text">Group By</span>
+  </label>
+  <select
+    id={groupSelectId}
+    class="select select-bordered"
+    bind:value={$downloadGroup}
+  >
+    {#each Object.values(DownloadGroup) as group}
+      <option value={group}>{group}</option>
+    {/each}
+  </select>
+</div>
+
 <button
   class="btn btn-primary my-4"
   disabled={$selectedChapters.length === 0}
@@ -78,9 +95,15 @@
 </button>
 
 {#if chapterPage && manga}
-  {#each chapterPage.chapters as chapter}
-    <ChapterItem {chapter} mangaName={manga.view.title} />
-  {/each}
+  {#if $downloadGroup === DownloadGroup.chapter}
+    {#each chapterPage.chapters as chapter}
+      <ChapterItem {chapter} mangaName={manga.view.title} />
+    {/each}
+  {:else if $downloadGroup === DownloadGroup.volume}
+    {#each chapterPage.volumes as volume}
+      <VolumeItem {volume} mangaName={manga.view.title} />
+    {/each}
+  {/if}
 
   <ChaptersPagination
     pages={chapterPage.pages}
