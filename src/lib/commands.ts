@@ -15,10 +15,10 @@ export type MangaView = {
 export async function search(query: string) {
   try {
     const views: MangaView[] = await invoke('search', { query });
-    debug(`received search results: ${JSON.stringify(views, null, 4)}`);
+    debug(`received search results: ${JSON.stringify(views, null, 2)}`);
     return views;
   } catch (e) {
-    error(`failed to invoke command "search": ${JSON.stringify(e, null, 4)}`);
+    error(`failed to invoke command "search": ${JSON.stringify(e, null, 2)}`);
     return [];
   }
 }
@@ -35,10 +35,10 @@ export type Manga = {
 export async function getManga(id: string) {
   try {
     const manga: Manga = await invoke('get_manga', { id });
-    debug(`received manga: ${JSON.stringify(manga, null, 4)}`);
+    debug(`received manga: ${JSON.stringify(manga, null, 2)}`);
     return manga;
   } catch (e) {
-    error(`failed to invoke command "getManga": ${JSON.stringify(e, null, 4)}`);
+    error(`failed to invoke command "getManga": ${JSON.stringify(e, null, 2)}`);
     return undefined;
   }
 
@@ -59,24 +59,38 @@ export type ChaptersResponse = {
 }
 
 export class ChapterPage {
-  chapters: Chapter[]
-  limit: number
-  offset: number
-  total: number
+  constructor(
+    private chapterResponse: ChaptersResponse
+  ) { }
 
-  constructor(res: ChaptersResponse) {
-    this.chapters = res.chapters;
-    this.limit = res.limit;
-    this.offset = res.offset;
-    this.total = res.total;
+  static readonly noVolumeKey = '__noVolume';
+
+  get chapters(): Chapter[] {
+    return this.chapterResponse.chapters;
   }
 
-  public get pages(): number {
-    return Math.ceil(this.total / this.limit);
+  get pages(): number {
+    return Math.ceil(this.chapterResponse.total / this.chapterResponse.limit);
   }
 
-  public get currentPage(): number {
-    return this.offset / this.limit + 1;
+  get currentPage(): number {
+    return this.chapterResponse.offset / this.chapterResponse.limit + 1;
+  }
+
+  get volumes(): Volume[] {
+    const volumeMap = this.chapters.reduce((prev, chapter) => {
+      const volume = chapter.volume ?? ChapterPage.noVolumeKey;
+
+      return {
+        ...prev,
+        [volume]: {
+          volume,
+          chapters: [...(prev[volume]?.chapters ?? []), { ...chapter }]
+        }
+      }
+    }, {} as { [key: string]: Volume });
+
+    return Object.values(volumeMap);
   }
 }
 
@@ -90,6 +104,11 @@ export type Chapter = {
   externalUrl?: string
 }
 
+export type Volume = {
+  volume: string
+  chapters: Chapter[]
+}
+
 export type ScanGroup = {
   name: string,
   id: string,
@@ -97,11 +116,12 @@ export type ScanGroup = {
 
 export async function getChapters(props: GetChapterProps) {
   try {
-    const chapters: ChaptersResponse = await invoke('get_chapters', props);
-    debug(`received chapters: ${JSON.stringify(chapters, null, 4)}`);
+    const chapters = await invoke<ChaptersResponse>('get_chapters', props);
+    debug(`received chapters: ${JSON.stringify(chapters, null, 2)}`);
     return new ChapterPage(chapters);
   } catch (e) {
-    error(`failed to invoke command "getChapters": ${JSON.stringify(e, null, 4)}`);
+    error(`${e}`);
+    error(`failed to invoke command "getChapters": ${JSON.stringify(e, null, 2)}`);
     return undefined;
   }
 }
@@ -112,6 +132,6 @@ export async function downloadChapters() {
     await invoke('download', { chapters });
     debug(`file downloaded`);
   } catch (e) {
-    error(`failed to invoke command "download": ${JSON.stringify(e, null, 4)}`);
+    error(`failed to invoke command "download": ${JSON.stringify(e, null, 2)}`);
   }
 }

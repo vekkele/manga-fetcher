@@ -99,3 +99,6 @@
 
 <h2>Chapters</h2>
 <pre>{JSON.stringify(chapterPage, null, 2)}</pre>
+
+<h2>Volumes</h2>
+<pre>{JSON.stringify(chapterPage?.volumes, null, 2)}</pre>
