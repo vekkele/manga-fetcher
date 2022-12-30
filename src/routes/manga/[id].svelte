@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import {
     ChapterPage,
@@ -16,11 +15,6 @@
   import { onMount } from "svelte";
 
   $: id = $page.params["id"];
-
-  function back() {
-    selectedChapters.clear();
-    goto("/");
-  }
 
   let manga: Manga | undefined;
   let chapterPage: ChapterPage | undefined;
@@ -59,69 +53,53 @@
   }
 </script>
 
-<button class="btn" on:click={back}>To Search</button>
-
-<section class="flex">
-  <div>
-    <img src="" alt="" />
-  </div>
-</section>
-
 {#if manga}
   <MangaInfo {manga} />
 {/if}
 
-<div class="form-control w-52 max-w-xs">
-  <label for={groupSelectId} class="label">
-    <span class="label-text">Group By</span>
-  </label>
-  <select
-    id={groupSelectId}
-    class="select select-bordered"
-    bind:value={$downloadGroup}
+<section class="px-5 pb-20 relative">
+  <div class="form-control w-52 max-w-xs">
+    <label for={groupSelectId} class="label">
+      <span class="label-text">Group By</span>
+    </label>
+    <select
+      id={groupSelectId}
+      class="select select-bordered"
+      bind:value={$downloadGroup}
+    >
+      {#each Object.values(DownloadGroup) as group}
+        <option value={group}>{group}</option>
+      {/each}
+    </select>
+  </div>
+
+  <button
+    class="btn btn-primary my-4"
+    disabled={$selectedChapters.length === 0}
+    on:click={downloadChapters}
   >
-    {#each Object.values(DownloadGroup) as group}
-      <option value={group}>{group}</option>
-    {/each}
-  </select>
-</div>
+    download
+  </button>
 
-<button
-  class="btn btn-primary my-4"
-  disabled={$selectedChapters.length === 0}
-  on:click={downloadChapters}
->
-  download
-</button>
+  {#if chapterPage && manga}
+    {#if $downloadGroup === DownloadGroup.chapter}
+      {#each chapterPage.chapters as chapter}
+        <ChapterItem {chapter} mangaName={manga.view.title} />
+      {/each}
+    {:else if $downloadGroup === DownloadGroup.volume}
+      {#each chapterPage.volumes as volume}
+        <VolumeItem {volume} mangaName={manga.view.title} />
+      {/each}
+    {/if}
 
-{#if chapterPage && manga}
-  {#if $downloadGroup === DownloadGroup.chapter}
-    {#each chapterPage.chapters as chapter}
-      <ChapterItem {chapter} mangaName={manga.view.title} />
-    {/each}
-  {:else if $downloadGroup === DownloadGroup.volume}
-    {#each chapterPage.volumes as volume}
-      <VolumeItem {volume} mangaName={manga.view.title} />
-    {/each}
+    <div
+      class="fixed bottom-0 left-0 right-0 flex justify-center py-2 backdrop-blur-sm bg-slate-700/60"
+    >
+      <ChaptersPagination
+        pages={chapterPage.pages}
+        currentPage={chapterPage.currentPage}
+        {fetchPage}
+      />
+    </div>
   {/if}
-
-  <ChaptersPagination
-    pages={chapterPage.pages}
-    currentPage={chapterPage.currentPage}
-    {fetchPage}
-  />
-{/if}
-
-<h2>Selected Chapters:</h2>
-{#each $selectedChapters as ch, i}
-  <div>{i}: {ch}</div>
-{/each}
-
-<h2>Manga</h2>
-<pre>{JSON.stringify(manga, null, 2)}</pre>
-
-<h2>Chapters</h2>
-<pre>{JSON.stringify(chapterPage, null, 2)}</pre>
-
-<h2>Volumes</h2>
-<pre>{JSON.stringify(chapterPage?.volumes, null, 2)}</pre>
+</section>

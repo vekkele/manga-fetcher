@@ -1,17 +1,31 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import type { Manga } from "$lib/commands";
+  import { selectedChapters } from "$lib/store";
 
   export let manga: Manga;
+
+  function back() {
+    selectedChapters.clear();
+    goto("/");
+  }
 </script>
 
 <section>
   <header class="flex">
-    <img
-      src={manga.view.coverUrl}
-      alt="manga cover"
-      loading="lazy"
-      width="200"
-    />
+    <div>
+      <button
+        class="btn btn-xs btn-block btn-primary rounded-none"
+        on:click={back}>BACK</button
+      >
+      <img
+        class="rounded-br-md"
+        src={manga.view.coverUrl}
+        alt="manga cover"
+        loading="lazy"
+        width="200"
+      />
+    </div>
     <div class="p-4">
       <h1 class="text-6xl">{manga.view.title}</h1>
       <h3 class="my-2 text-xl">{manga.author}</h3>
