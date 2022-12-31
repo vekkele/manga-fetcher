@@ -50,7 +50,7 @@
 
   {#if $mangaList}
     {#if $loading}
-      <progress class="progress progress-primary" />
+      <div>Loading...</div>
     {:else}
       <section class="flex flex-wrap gap-4">
         {#if $mangaList.length === 0}
