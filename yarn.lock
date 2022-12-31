@@ -797,6 +797,11 @@
     expect "^29.0.0"
     pretty-format "^29.0.0"
 
+"@types/marked@^4.0.1":
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-4.0.8.tgz#b316887ab3499d0a8f4c70b7bd8508f92d477955"
+  integrity sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==
+
 "@types/node@*":
   version "17.0.31"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.31.tgz#a5bb84ecfa27eec5e1c802c6bbf8139bdb163a5d"
@@ -2326,6 +2331,11 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
+marked@^4.0.10:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.2.5.tgz#979813dfc1252cc123a79b71b095759a32f42a5d"
+  integrity sha512-jPueVhumq7idETHkb203WDD4fMA3yV9emQ5vLwop58lu8bTclMghBWcYAavlDqIEMaisADinV1TooIFCfqOsYQ==
+
 merge-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/merge-stream/-/merge-stream-2.0.0.tgz#52823629a14dd00c9770fb6ad47dc6310f2c1f60"
@@ -2886,6 +2896,14 @@ svelte-hmr@^0.14.11:
   version "0.14.11"
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.14.11.tgz#63d532dc9c2c849ab708592f034765fa2502e568"
   integrity sha512-R9CVfX6DXxW1Kn45Jtmx+yUe+sPhrbYSUp7TkzbW0jI5fVPn6lsNG9NEs5dFg5qRhFNAoVdRw5qQDLALNKhwbQ==
+
+svelte-markdown@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/svelte-markdown/-/svelte-markdown-0.2.3.tgz#16c6db61605512100cf25c3e18f8e4105837895c"
+  integrity sha512-2h680NzTXnAD0CXhxe3GeHl6W+ayG4iKQRl+BIDRw+R0mUE0OiNxP1Vt8Rn+aWevB/LBiBIPCAwvL+0BkG057A==
+  dependencies:
+    "@types/marked" "^4.0.1"
+    marked "^4.0.10"
 
 svelte-preprocess@^4.0.0, svelte-preprocess@^4.10.5:
   version "4.10.6"

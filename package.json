@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.0-rc.4",
+    "svelte-markdown": "^0.2.3",
     "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#release"
   }
 }
