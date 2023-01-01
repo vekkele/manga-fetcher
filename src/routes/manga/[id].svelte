@@ -17,9 +17,10 @@
   $: id = $page.params["id"];
 
   let manga: Manga | undefined;
-  let chapterPage: ChapterPage | undefined;
+  let chapterPage: ChapterPage | null;
   let loading = false;
   let pageLoading = false;
+  let currentPage = 1;
 
   const limit = 10;
   const groupSelectId = "download-group-select";
@@ -46,8 +47,10 @@
   }
 
   async function fetchPage(page: number) {
+    if (page === currentPage) return;
+    currentPage = page;
     pageLoading = true;
-    const offset = (page - 1) * limit;
+    const offset = (currentPage - 1) * limit;
 
     chapterPage = await getChapters({
       mangaId: id,
@@ -55,6 +58,7 @@
       limit,
       offset: offset,
     });
+
     pageLoading = false;
   }
 </script>
@@ -112,7 +116,7 @@
       >
         <ChaptersPagination
           pages={chapterPage.pages}
-          currentPage={chapterPage.currentPage}
+          {currentPage}
           {fetchPage}
         />
       </div>

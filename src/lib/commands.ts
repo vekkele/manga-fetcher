@@ -73,10 +73,6 @@ export class ChapterPage {
     return Math.ceil(this.chapterResponse.total / this.chapterResponse.limit);
   }
 
-  get currentPage(): number {
-    return this.chapterResponse.offset / this.chapterResponse.limit + 1;
-  }
-
   get volumes(): Volume[] {
     const volumeMap = this.chapters.reduce((prev, chapter) => {
       const volume = chapter.volume ?? ChapterPage.noVolumeKey;
@@ -122,7 +118,7 @@ export async function getChapters(props: GetChapterProps) {
   } catch (e) {
     error(`${e}`);
     error(`failed to invoke command "getChapters": ${JSON.stringify(e, null, 2)}`);
-    return undefined;
+    return null;
   }
 }
 
