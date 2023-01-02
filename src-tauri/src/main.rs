@@ -3,12 +3,16 @@
     windows_subsystem = "windows"
 )]
 
+use tauri::Menu;
 use tauri_plugin_log::{LogTarget, LoggerBuilder};
 
 use app::commands;
 
 fn main() {
+    let menu = Menu::os_default("Manga Fetcher");
+
     tauri::Builder::default()
+        .menu(menu)
         .plugin(
             LoggerBuilder::new()
                 .targets([
