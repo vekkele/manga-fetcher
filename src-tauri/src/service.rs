@@ -2,13 +2,17 @@ use std::ffi::OsStr;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
+use async_recursion::async_recursion;
 use futures::stream::{self, StreamExt};
 use log::{debug, error, info};
+use reqwest::{Response, Url};
+use serde::Serialize;
 use thiserror::Error;
 use zip::write::FileOptions;
 
-use crate::constants::MANGADEX_API;
+use crate::constants::{MANGADEX_API, MANGADEX_REPORT_URL, MAX_FRAME_RETRIES};
 
 use crate::model::{
     ApiResponse, AtHomeResponse, ChapterProps, ChaptersResponse, FeedData, Manga, MangaData,
@@ -96,11 +100,10 @@ pub async fn download_chapter(chapter: ChapterProps) -> Result<()> {
 
     let chapter_id = chapter.id;
     let chapter_name = chapter.fullname;
-    let at_home_url = format!("{MANGADEX_API}/at-home/server/{chapter_id}");
-    let res: AtHomeResponse = reqwest::get(at_home_url).await?.json().await?;
+    let at_home = get_at_home(&chapter_id).await?;
 
-    let base_url = res.base_url;
-    let hash = res.chapter.hash;
+    let base_url = at_home.base_url;
+    let hash = at_home.chapter.hash;
 
     let client = reqwest::Client::new();
     let chapter_path_buf = get_chapter_path(&chapter_name);
@@ -108,19 +111,22 @@ pub async fn download_chapter(chapter: ChapterProps) -> Result<()> {
 
     fs::create_dir_all(chapter_path)?;
 
-    let frame_urls = res.chapter.data_saver;
+    let frame_urls = at_home.chapter.data_saver;
     let total_frames = frame_urls.len();
     let stream = stream::iter(frame_urls)
         .enumerate()
         .map(|(index, file_name)| {
+            let frame_url = get_frame_url(&base_url, &hash, &file_name);
+
             download_frame(
+                &chapter_id,
+                frame_url,
                 file_name,
                 &client,
-                &base_url,
-                &hash,
                 chapter_path,
                 index,
                 total_frames,
+                MAX_FRAME_RETRIES,
             )
         })
         .buffer_unordered(CONCURRENT_FRAMES);
@@ -160,23 +166,113 @@ fn get_pad_width(max_num: usize) -> usize {
     max_num.to_string().len()
 }
 
+async fn get_at_home(chapter_id: &str) -> Result<AtHomeResponse> {
+    let at_home_url = format!("{MANGADEX_API}/at-home/server/{chapter_id}");
+
+    let res: AtHomeResponse = reqwest::get(at_home_url).await?.json().await?;
+
+    Ok(res)
+}
+
+fn get_frame_url(base_url: &str, hash: &str, file_name: &str) -> String {
+    format!("{base_url}/data-saver/{hash}/{file_name}")
+}
+
+//FIXME: Fix too many args warning
+#[async_recursion]
+#[allow(clippy::too_many_arguments)]
 async fn download_frame(
+    chapter_id: &str,
+    frame_url: String,
     file_name: String,
     client: &reqwest::Client,
-    base_url: &str,
-    hash: &str,
     chapter_path: &Path,
     frame_index: usize,
     total_frames: usize,
+    retries_left: u32,
 ) -> Result<String> {
-    let frame_url = format!("{base_url}/data-saver/{hash}/{file_name}");
     let frame_name = get_frame_name(&file_name, frame_index, total_frames);
     let file_path = chapter_path.join(&frame_name);
-    let file_data = client.get(frame_url).send().await?.bytes().await?;
+    let start = Instant::now();
+    let response = client.get(frame_url).send().await?;
+    let end = Instant::now();
+    let duration = end.duration_since(start).as_millis();
+
+    let download_successful = report_frame(client, &response, duration).await?;
+    let has_retries_left = retries_left - 1 > 0;
+    if !download_successful && has_retries_left {
+        let at_home = get_at_home(chapter_id).await?;
+        let frame_urls = &at_home.chapter.data_saver;
+        let file_name = &frame_urls[frame_index];
+        let frame_url = get_frame_url(&at_home.base_url, &at_home.chapter.hash, file_name);
+
+        return download_frame(
+            chapter_id,
+            frame_url,
+            file_name.clone(),
+            client,
+            chapter_path,
+            frame_index,
+            total_frames,
+            retries_left - 1,
+        )
+        .await;
+    }
+
+    let file_data = response.bytes().await?;
 
     fs::write(file_path, file_data)?;
 
     Ok(file_name)
+}
+
+#[derive(Serialize)]
+struct FrameReport<'a> {
+    url: &'a Url,
+    success: bool,
+    cached: bool,
+    bytes: u64,
+    duration: u128,
+}
+
+async fn report_frame(
+    client: &reqwest::Client,
+    response: &Response,
+    duration: u128,
+) -> Result<bool> {
+    let url = response.url();
+    let status = response.status();
+    let success = status.is_success();
+
+    let has_mangadex_domain = match url.host_str() {
+        Some(host) => host.contains("mangadex.org"),
+        None => false,
+    };
+
+    if has_mangadex_domain {
+        return Ok(success);
+    }
+
+    let bytes = response.content_length().unwrap_or(0);
+    let cache = response.headers().get("X-Cache");
+    let cached = match cache {
+        Some(cache) => cache.to_str().unwrap_or("").contains("HIT"),
+        None => false,
+    };
+
+    client
+        .post(MANGADEX_REPORT_URL)
+        .json(&FrameReport {
+            url,
+            success,
+            bytes,
+            cached,
+            duration,
+        })
+        .send()
+        .await?;
+
+    Ok(success)
 }
 
 fn write_zip(chapter_path: &Path, chapter_name: &str) -> Result<()> {
