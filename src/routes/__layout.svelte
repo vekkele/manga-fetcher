@@ -1,4 +1,5 @@
 <script lang="ts">
+  import InfoModal from "$lib/components/InfoModal.svelte";
   import { onDestroy } from "svelte";
   import "../app.css";
 
@@ -17,4 +18,5 @@
 
 <main>
   <slot />
+  <InfoModal />
 </main>
