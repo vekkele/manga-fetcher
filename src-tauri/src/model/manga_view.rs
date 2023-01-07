@@ -10,7 +10,6 @@ pub struct MangaView {
     title: String,
     status: String,
     cover_url: Option<String>,
-    lang_codes: Vec<String>,
 }
 
 impl From<&MangaData> for MangaView {
@@ -40,24 +39,11 @@ impl From<&MangaData> for MangaView {
                 Some(url)
             });
 
-        let lang_codes = manga
-            .attributes
-            .translations
-            .iter()
-            .map(|t| t.split('-').next().unwrap().to_string())
-            .map(|code| match code.as_str() {
-                "en" => "gb".to_string(),
-                "zh" => "cn".to_string(),
-                c => c.to_string(),
-            })
-            .collect();
-
         MangaView {
             id: manga.id.to_owned(),
             title,
             status: manga.attributes.status.to_owned(),
             cover_url,
-            lang_codes,
         }
     }
 }

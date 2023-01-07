@@ -9,7 +9,6 @@ export type MangaView = {
   title: string
   status: string
   coverUrl?: string
-  langCodes: string[]
 }
 
 export async function search(query: string) {

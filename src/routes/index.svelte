@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Flag from "$lib/components/Flag.svelte";
   import Status from "$lib/components/Status.svelte";
   import { mangaList } from "$lib/store";
 
@@ -76,14 +75,6 @@
                 >
                 <Status status={manga.status} />
               </h2>
-
-              <div class="flex justify-end items-end w-full">
-                <div class="grid grid-cols-3 gap-1 justify-end">
-                  {#each manga.langCodes.slice(0, 9) as code}
-                    <Flag {code} />
-                  {/each}
-                </div>
-              </div>
             </div>
           </div>
         {/each}
