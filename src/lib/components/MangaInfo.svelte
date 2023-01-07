@@ -1,9 +1,8 @@
 <script lang="ts">
-  import SvelteMarkdown from "svelte-markdown";
   import { goto } from "$app/navigation";
   import type { Manga } from "$lib/commands";
   import { selectedChapters } from "$lib/store";
-  import LinkMarkdown from "./LinkMarkdown.svelte";
+  import Markdown from "./Markdown.svelte";
 
   export let manga: Manga;
 
@@ -46,10 +45,7 @@
         <span>{manga.view.status}</span>
       </div>
 
-      <SvelteMarkdown
-        source={manga.description}
-        renderers={{ link: LinkMarkdown }}
-      />
+      <Markdown source={manga.description} />
     </div>
   </header>
 </section>

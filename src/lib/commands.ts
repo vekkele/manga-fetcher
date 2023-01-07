@@ -106,8 +106,10 @@ export type Volume = {
 }
 
 export type ScanGroup = {
-  name: string,
   id: string,
+  name: string,
+  website?: string,
+  description?: string,
 }
 
 export async function getChapters(props: GetChapterProps) {

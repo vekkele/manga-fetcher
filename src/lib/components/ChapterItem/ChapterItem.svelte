@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Chapter } from "$lib/commands";
+  import Link from "$lib/icons/Link.svelte";
   import { selectedChapters } from "$lib/store";
+  import ScanGroupInfoModal from "./ScanGroupInfoModal.svelte";
 
   export let chapter: Chapter;
   export let mangaName: string;
@@ -18,10 +20,10 @@
 
 <a
   href={chapter.externalUrl}
-  class={`block w-full label-text ${typeClass}`}
+  class={`group block w-full label-text ${typeClass}`}
   target="_blank"
 >
-  <label class="flex gap-2 label cursor-pointer justify-start">
+  <label class="flex gap-2 label cursor-pointer justify-start items-center">
     <input
       type="checkbox"
       class="checkbox"
@@ -30,18 +32,17 @@
       on:change={(e) => toggle({ id, fullname }, e.currentTarget.checked)}
     />
     <span>{chapterName}</span>
-    {#if !canDownload}
-      <svg
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="16px"
-        height="16px"
-      >
-        <path
-          d="M 3 3 L 3 21 L 21 21 L 21 12 L 19 12 L 19 19 L 5 19 L 5 5 L 12 5 L 12 3 L 3 3 z M 14 3 L 14 5 L 17.585938 5 L 8.2929688 14.292969 L 9.7070312 15.707031 L 19 6.4140625 L 19 10 L 21 10 L 21 3 L 14 3 z"
+    {#if chapter.scanGroup && canDownload}
+      <div class="ml-auto">
+        <ScanGroupInfoModal
+          triggerClass="opacity-0 group-hover:opacity-100 transition-all"
+          chapterId={id}
+          scanGroup={chapter.scanGroup}
         />
-      </svg>
+      </div>
+    {/if}
+    {#if !canDownload}
+      <Link width="16px" height="16px" />
     {/if}
   </label>
 </a>

@@ -29,4 +29,6 @@ pub struct ChapterRelationship {
 #[derive(Debug, Deserialize)]
 pub struct ChapterRelationshipAttributes {
     pub name: Option<String>,
+    pub website: Option<String>,
+    pub description: Option<String>,
 }

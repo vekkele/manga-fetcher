@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Volume } from "$lib/commands";
-  import ChapterItem from "./ChapterItem.svelte";
+  import ChapterItem from "./ChapterItem/ChapterItem.svelte";
 
   export let volume: Volume;
   export let mangaName: string;

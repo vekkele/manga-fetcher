@@ -7,7 +7,7 @@
     getManga,
     type Manga,
   } from "$lib/commands";
-  import ChapterItem from "$lib/components/ChapterItem.svelte";
+  import ChapterItem from "$lib/components/ChapterItem/ChapterItem.svelte";
   import ChaptersPagination from "$lib/components/ChaptersPagination.svelte";
   import MangaInfo from "$lib/components/MangaInfo.svelte";
   import VolumeItem from "$lib/components/VolumeItem.svelte";
