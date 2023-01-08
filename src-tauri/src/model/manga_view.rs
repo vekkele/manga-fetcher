@@ -10,6 +10,8 @@ pub struct MangaView {
     title: String,
     status: String,
     cover_url: Option<String>,
+    description: Option<String>,
+    genres: Vec<String>,
 }
 
 impl From<&MangaData> for MangaView {
@@ -39,11 +41,32 @@ impl From<&MangaData> for MangaView {
                 Some(url)
             });
 
+        let description_map = &manga.attributes.description;
+        let description = description_map
+            .get("en")
+            .or_else(|| {
+                let mut description_iter = description_map.iter();
+                description_iter.next().map(|(_, v)| v)
+            })
+            .cloned();
+
+        let genres: Vec<String> = manga
+            .attributes
+            .tags
+            .iter()
+            .filter_map(|t| match t.attributes.group.as_str() {
+                "genre" => Some(t.attributes.name.get("en")?.to_owned()),
+                _ => None,
+            })
+            .collect();
+
         MangaView {
             id: manga.id.to_owned(),
             title,
             status: manga.attributes.status.to_owned(),
             cover_url,
+            description,
+            genres,
         }
     }
 }

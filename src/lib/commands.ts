@@ -9,6 +9,8 @@ export type MangaView = {
   title: string
   status: string
   coverUrl?: string
+  description?: string
+  genres: string[]
 }
 
 export async function search(query: string) {
@@ -23,9 +25,7 @@ export async function search(query: string) {
 }
 
 export type Manga = {
-  view: MangaView
-  description?: string,
-  genres: string[],
+  view: MangaView,
   year?: number,
   avg_score?: number,
   author?: string,

@@ -36,13 +36,14 @@
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          ><path
+        >
+          <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          /></svg
-        >
+          />
+        </svg>
       </button>
     </form>
   </section>
@@ -68,13 +69,23 @@
               </a>
             </div>
 
-            <div class="w-full min-w-0  p-2">
+            <div class="w-full min-w-0 p-2 overflow-hidden">
               <h2 class="flex card-title justify-between">
-                <span class="whitespace-nowrap overflow-hidden text-ellipsis"
-                  >{manga.title}</span
-                >
+                <span class="whitespace-nowrap overflow-hidden text-ellipsis">
+                  {manga.title}
+                </span>
                 <Status status={manga.status} />
               </h2>
+
+              <div class="flex flex-wrap overflow-hidden h-5 gap-2 my-1">
+                {#each manga.genres as genre}
+                  <div class="badge bg-amber-400 text-black">
+                    {genre}
+                  </div>
+                {/each}
+              </div>
+
+              <p class="description">{manga.description}</p>
             </div>
           </div>
         {/each}
@@ -107,5 +118,13 @@
     .img-overlay:hover > & {
       @apply opacity-100;
     }
+  }
+
+  .description {
+    @apply overflow-hidden text-ellipsis;
+    @apply text-xs mt-2;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
   }
 </style>

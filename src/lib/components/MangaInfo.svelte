@@ -32,7 +32,7 @@
       <h3 class="my-2 text-xl">{manga.author}</h3>
 
       <div class="flex flex-wrap gap-2 my-2">
-        {#each manga.genres as genre}
+        {#each manga.view.genres as genre}
           <div class="px-2 rounded-xl bg-amber-400 text-black">
             {genre}
           </div>
@@ -45,7 +45,7 @@
         <span>{manga.view.status}</span>
       </div>
 
-      <Markdown source={manga.description} />
+      <Markdown source={manga.view.description} />
     </div>
   </header>
 </section>
