@@ -16,7 +16,7 @@
     for={id}
     class={`btn btn-circle btn-xs text-white ${triggerClass}`}
   >
-    <Info />
+    <Info class="w-full h-full" />
   </label>
 
   <h2 class="text-xl mb-4">Scanlation Group info</h2>

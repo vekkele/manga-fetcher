@@ -6,7 +6,7 @@
 <Modal id="mangadex-credit-modal">
   <div slot="trigger" let:id class="fixed top-4 right-4">
     <label for={id} class="btn btn-circle text-white">
-      <Info />
+      <Info class="w-full h-full" />
     </label>
   </div>
 

@@ -42,7 +42,7 @@
       </div>
     {/if}
     {#if !canDownload}
-      <Link width="16px" height="16px" />
+      <Link class="w-4 h-4" />
     {/if}
   </label>
 </a>
