@@ -2,6 +2,8 @@
   import Search from "$lib/icons/Search.svelte";
   import { mangaList } from "$lib/store";
 
+  const inputId = "manga-search-input";
+
   let query = "";
   const loading = mangaList.loading;
   $: searchDisabled = !query || $loading;
@@ -13,12 +15,12 @@
 </script>
 
 <section class="search-section">
-  <label class="label" for="search-input">
+  <label class="label" for={inputId}>
     <span class="label-text">Search Query</span>
   </label>
   <form on:submit|preventDefault={submit} class="input-group">
     <input
-      id="search-input"
+      id={inputId}
       type="text"
       class="input input-bordered flex-1"
       spellcheck="false"
