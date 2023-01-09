@@ -1,7 +1,6 @@
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-
 pub struct FeedData {
     pub id: String,
     pub attributes: ChapterAttributes,

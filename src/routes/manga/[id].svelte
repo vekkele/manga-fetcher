@@ -1,10 +1,12 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import {
+    aggregate,
     ChapterPage,
     downloadChapters,
     getChapters,
     getManga,
+    type AggregatedChapters,
     type Manga,
   } from "$lib/commands";
   import ChapterItem from "$lib/components/ChapterItem/ChapterItem.svelte";
@@ -18,6 +20,7 @@
 
   let manga: Manga | undefined;
   let chapterPage: ChapterPage | null;
+  let allChapters: AggregatedChapters | undefined;
   let loading = false;
   let pageLoading = false;
   let currentPage = 1;
@@ -31,8 +34,9 @@
 
   async function fetchData() {
     loading = true;
-    const [mangaData, chapters] = await Promise.all([
+    const [mangaData, aggregatedData, chapters] = await Promise.all([
       getManga(id),
+      aggregate(id, "en"),
       getChapters({
         mangaId: id,
         lang: "en",
@@ -42,6 +46,7 @@
     ]);
 
     manga = mangaData;
+    allChapters = aggregatedData;
     chapterPage = chapters;
     loading = false;
   }
@@ -96,7 +101,7 @@
       download
     </button>
 
-    {#if chapterPage && manga}
+    {#if chapterPage && manga && allChapters}
       {#if pageLoading}
         <div class="w-full h-96 flex justify-center items-center">
           Loading...
@@ -120,6 +125,10 @@
           {fetchPage}
         />
       </div>
+
+      <pre>
+        {JSON.stringify(allChapters.chapterIds, null, 2)}
+      </pre>
     {/if}
   </section>
 {/if}

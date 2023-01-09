@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Chapter } from "$lib/commands";
   import Link from "$lib/icons/Link.svelte";
-  import { selectedChapters } from "$lib/store";
+  import { ChapterProps, selectedChapters } from "$lib/store";
   import ScanGroupInfoModal from "./ScanGroupInfoModal.svelte";
 
   export let chapter: Chapter;
@@ -9,8 +9,7 @@
 
   $: ({ chapter: chapterNum, title, id } = chapter);
   $: selected = $selectedChapters.some((ch) => ch.id === id);
-  $: chapterName = `Chapter ${chapterNum}${title ? ` - ${title}` : ""}`;
-  $: fullname = `${mangaName} ${chapterName}`;
+  $: chapterProps = new ChapterProps(id, chapterNum, mangaName, title);
 
   $: canDownload = !chapter.externalUrl;
   $: typeClass = canDownload ? "chapter-select" : "chapter-link";
@@ -29,9 +28,9 @@
       class="checkbox"
       disabled={!canDownload}
       bind:checked={selected}
-      on:change={(e) => toggle({ id, fullname }, e.currentTarget.checked)}
+      on:change={(e) => toggle(chapterProps, e.currentTarget.checked)}
     />
-    <span>{chapterName}</span>
+    <span>{chapterProps.chapterName}</span>
     {#if chapter.scanGroup && canDownload}
       <div class="ml-auto">
         <ScanGroupInfoModal

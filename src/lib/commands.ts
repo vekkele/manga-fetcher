@@ -125,10 +125,53 @@ export async function getChapters(props: GetChapterProps) {
 
 export async function downloadChapters() {
   try {
-    const chapters = get(selectedChapters);
+    const chapters = get(selectedChapters).map(ch => ch.asObject());
     await invoke('download', { chapters });
     debug(`file downloaded`);
   } catch (e) {
     error(`failed to invoke command "download": ${JSON.stringify(e, null, 2)}`);
+  }
+}
+
+
+export class AggregatedChapters {
+  constructor(
+    private data: AggregatedData,
+  ) { }
+
+
+  get chapterIds(): string[] {
+    const chapters: string[] = [];
+
+    for (const volume of Object.values(this.data.volumes)) {
+      for (const chapter of Object.values(volume.chapters)) {
+        chapters.push(chapter.id);
+      }
+    }
+
+    return chapters;
+  }
+}
+
+type AggregatedData = {
+  volumes: { [key: string]: VolumeAggregate },
+}
+
+type VolumeAggregate = {
+  volume: string,
+  chapters: { [key: string]: ChapterAggregate },
+}
+
+type ChapterAggregate = {
+  chapter: string,
+  id: string,
+}
+
+export async function aggregate(id: string, lang: string) {
+  try {
+    const aggregated = await invoke<AggregatedData>('aggregate', { id, lang });
+    return new AggregatedChapters(aggregated);
+  } catch (e) {
+    error(`failed to invoke command "aggregate": ${JSON.stringify(e, null, 2)}`);
   }
 }

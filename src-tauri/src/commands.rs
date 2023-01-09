@@ -4,7 +4,9 @@ use log::{debug, error};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::model::{ChapterProps, ChaptersResponse, Manga, MangaView, ServiceError};
+use crate::model::{
+    AggregateResponse, ChapterProps, ChaptersResponse, Manga, MangaView, ServiceError,
+};
 use crate::service;
 
 #[derive(Debug, Error, Serialize)]
@@ -55,4 +57,10 @@ pub async fn get_chapters(
 pub async fn download(chapters: Vec<ChapterProps>) -> Result<()> {
     service::download(chapters).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn aggregate(id: &str, lang: &str) -> Result<AggregateResponse> {
+    let res = service::aggregate(id, lang).await?;
+    Ok(res)
 }

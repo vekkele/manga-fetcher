@@ -22,9 +22,32 @@ function createMangaList() {
 
 export const mangaList = createMangaList();
 
-export type ChapterProps = {
-  id: string
-  fullname: string
+export class ChapterProps {
+  constructor(
+    private _id: string,
+    private chapter: string,
+    private mangaName: string,
+    private title?: string,
+  ) { }
+
+  get id() {
+    return this._id;
+  }
+
+  get chapterName() {
+    return `Chapter ${this.chapter}${this.title ? ` - ${this.title}` : ""}`;
+  }
+
+  get fullname() {
+    return `${this.mangaName} ${this.chapterName}`;
+  }
+
+  asObject() {
+    return {
+      id: this.id,
+      fullname: this.fullname,
+    }
+  }
 }
 
 function createSelectedChapters() {

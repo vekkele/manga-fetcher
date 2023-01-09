@@ -15,8 +15,9 @@ use zip::write::FileOptions;
 use crate::constants::{MANGADEX_API, MANGADEX_REPORT_URL, MAX_FRAME_RETRIES};
 
 use crate::model::{
-    ApiResponse, AtHomeResponse, ChapterProps, ChaptersResponse, FeedData, Manga, MangaData,
-    MangaStatistics, MangaView, ResponseError, Result, ServiceError, StatisticsResponse,
+    AggregateResponse, ApiResponse, AtHomeResponse, ChapterProps, ChaptersResponse, FeedData,
+    Manga, MangaData, MangaStatistics, MangaView, ResponseError, Result, ServiceError,
+    StatisticsResponse,
 };
 
 #[derive(Error, Debug)]
@@ -76,6 +77,13 @@ pub async fn fetch_feed(id: &str, lang: &str, limit: u32, offset: u32) -> Result
     let response: ChaptersResponse = res.try_into()?;
 
     Ok(response)
+}
+
+pub async fn aggregate(id: &str, lang: &str) -> Result<AggregateResponse> {
+    let aggregate_url = format!("{MANGADEX_API}/manga/{id}/aggregate?translatedLanguage[]={lang}");
+    let res: AggregateResponse = reqwest::get(aggregate_url).await?.json().await?;
+
+    Ok(res)
 }
 
 pub async fn download(chapters: Vec<ChapterProps>) -> Result<()> {
