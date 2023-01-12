@@ -125,10 +125,6 @@
           {fetchPage}
         />
       </div>
-
-      <pre>
-        {JSON.stringify(allChapters.chapterIds, null, 2)}
-      </pre>
     {/if}
   </section>
 {/if}
