@@ -4,7 +4,7 @@
 )]
 
 use tauri::Menu;
-use tauri_plugin_log::{LogTarget, LoggerBuilder};
+use tauri_plugin_log::{Builder, LogTarget};
 
 use app::commands;
 
@@ -14,7 +14,7 @@ fn main() {
     tauri::Builder::default()
         .menu(menu)
         .plugin(
-            LoggerBuilder::new()
+            Builder::new()
                 .targets([
                     // write to the OS logs folder
                     LogTarget::LogDir,
