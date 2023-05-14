@@ -4,6 +4,10 @@ App for downloading manga as cbz archive using [MangaDex.org](https://mangadex.o
 
 Currently in support only MacOS as I cannot cross-compile it for other platforms
 
+## Download
+
+You can download latest build [here](https://github.com/vekkele/manga-fetcher/releases)
+
 ## Development
 
 1. Install [Node](https://nodejs.org/en/download), [yarn](https://yarnpkg.com/getting-started/install) and [Rust](https://www.rust-lang.org/learn/get-started)
